@@ -3,7 +3,7 @@
 
 typedef uint16_t fp16_t;
 
-float bits_to_fp32(uint32_t w)
+static inline float bits_to_fp32(uint32_t w)
 {
     union {
         uint32_t as_bits;
@@ -12,7 +12,7 @@ float bits_to_fp32(uint32_t w)
     return fp32.as_value;
 }
 
-uint32_t fp32_to_bits(float f)
+static inline uint32_t fp32_to_bits(float f)
 {
     union {
         float as_value;
@@ -21,7 +21,7 @@ uint32_t fp32_to_bits(float f)
     return fp32.as_bits;
 }
 
-fp16_t fp32_to_fp16(float f)
+static inline fp16_t fp32_to_fp16(float f)
 {
     const float scale_to_inf = 0x1.0p+112f;
     const float scale_to_zero = 0x1.0p-110f;
@@ -43,7 +43,7 @@ fp16_t fp32_to_fp16(float f)
            (shl1_w > UINT32_C(0xFF000000) ? UINT16_C(0x7E00) : nonsign);
 }
 
-float fp16_to_fp32(fp16_t h)
+static inline float fp16_to_fp32(fp16_t h)
 {
     const uint32_t w = (uint32_t) h << 16;
     const uint32_t sign = w & UINT32_C(0x80000000);

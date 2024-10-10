@@ -309,8 +309,6 @@ fp32_to_fp16__body:
     lw t0, 4(sp)
     lw t1, 8(sp)
     lw t2, 12(sp)
-    addi sp, sp, 16
-    addi sp, sp, -16
     sw ra, 0(sp)
     sw t0, 4(sp)
     sw t1, 8(sp)

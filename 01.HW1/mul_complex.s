@@ -226,37 +226,6 @@ mul_float32__epilogue:
     addi sp, sp, 12
     ret
 
-
-bits_to_fp32: #TODO
-    # a0: input uint32 w
-    # t0: temp value for fp32
-bits_to_fp32__prologue:
-    addi sp, sp, -4
-    sw s0, 0(sp)
-bits_to_fp32__body:
-    mv s0, a0
-    mv t0, s0
-    mv a0, t0
-bits_to_fp32__epilogue:
-    lw s0, 0(sp)
-    addi sp, sp, 4
-    ret
-
-fp32_to_bits: #TODO
-    # a0: input float f
-    # t0: temp
-fp32_to_bits__prologue:
-    addi sp, sp, -4
-    sw s0, 0(sp)
-fp32_to_bits__body:
-    mv s0, a0
-    mv t0, s0
-    mv a0, t0
-fp32_to_bits__epilogue:
-    lw s0, 0(sp)
-    addi sp, sp, 4
-    ret
-
 fp16_to_fp32:
     # a0: input fp16_t h
 fp16_to_fp32__prologue:
@@ -284,21 +253,6 @@ fp16_to_fp32__body:
     sw t2, 12(sp)
     sw t3, 16(sp)
     mv a0, t3
-    jal ra, bits_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    addi sp, sp, 20
-
-    addi sp, sp, -20
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    mv a0, a0
     mv a1, t2
     jal ra, mul_float32
     mv t3, a0
@@ -314,97 +268,18 @@ fp16_to_fp32__body:
     li t5, 0x3F000000 # t5: magic_bias
     srli t6, s0, 17 # t6: denormalized_value
     or t6, t6, t4
-
-    addi sp, sp, -32
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    sw t4, 20(sp)
-    sw t5, 24(sp)
-    sw t6, 28(sp)
-    mv a0, t6
-    jal ra, bits_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    lw t4, 20(sp)
-    lw t5, 24(sp)
-    lw t6, 28(sp)
-    addi sp, sp, 32
-    sub t6, a0, t5
+    sub t6, t6, t5
 
     li s1, 1
     slli s1, s1, 27 # s1: denormalized_cutoff
     bltu s0, s1, fp16_to_fp32__taken
     j fp16_to_fp32__nottaken
 fp16_to_fp32__taken:
-    addi sp, sp, -32
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    sw t4, 20(sp)
-    sw t5, 24(sp)
-    sw t6, 28(sp)
     mv a0, t6
-    jal ra, fp32_to_bits
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    lw t4, 20(sp)
-    lw t5, 24(sp)
-    lw t6, 28(sp)
-    addi sp, sp, 32
 fp16_to_fp32__nottaken:
-    addi sp, sp, -32
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    sw t4, 20(sp)
-    sw t5, 24(sp)
-    sw t6, 28(sp)
     mv a0, t3
-    jal ra, fp32_to_bits
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    lw t4, 20(sp)
-    lw t5, 24(sp)
-    lw t6, 28(sp)
-    addi sp, sp, 32
 fp16_to_fp32__if_end:
     or a0, t0, a0 # a0: result
-    addi sp, sp, -32
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    sw t4, 20(sp)
-    sw t5, 24(sp)
-    sw t6, 28(sp)
-    mv a0, a0
-    jal ra, bits_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    lw t4, 20(sp)
-    lw t5, 24(sp)
-    lw t6, 28(sp)
-    addi sp, sp, 32
 fp16_to_fp32__epilogue:
     lw s0, 0(sp)
     lw s1, 4(sp)
@@ -454,18 +329,8 @@ fp32_to_fp16__body:
     addi sp, sp, 16
     mv t2, a0 # t2: base
 
-    addi sp, sp, -16
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
     mv a0, s0
-    jal ra, fp32_to_bits
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    addi sp, sp, 16
+
     mv t3, a0 # t3: w
     add t4, t3, t3 # t4: shl1_w
     li s3, 0x80000000
@@ -479,26 +344,7 @@ fp32_to_fp16__bge_taken:
     srli s1, t6, 1
     li s3, 0x07800000
     add s1, s1, s3
-    addi sp, sp, -32
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    sw t4, 20(sp)
-    sw t5, 24(sp)
-    sw t6, 28(sp)
-    mv a0, s1
-    jal ra, bits_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    lw t4, 20(sp)
-    lw t5, 24(sp)
-    lw t6, 28(sp)
-    addi sp, sp, 32
+
     addi sp, sp, -32
     sw ra, 0(sp)
     sw t0, 4(sp)
@@ -521,30 +367,7 @@ fp32_to_fp16__bge_taken:
     lw t6, 28(sp)
     addi sp, sp, 32
 
-    mv t2, a0 # t2: base
-
-    addi sp, sp, -32
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    sw t4, 20(sp)
-    sw t5, 24(sp)
-    sw t6, 28(sp)
-    mv a0, t2
-    jal ra, fp32_to_bits
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    lw t4, 20(sp)
-    lw t5, 24(sp)
-    lw t6, 28(sp)
-    addi sp, sp, 32
-
-    mv t2, a0 # t2: bits
+    mv t2, a0 # t2: base, bits
 
     srai t0, t2, 13
     li s3, 0x00007C00

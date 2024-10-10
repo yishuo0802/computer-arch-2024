@@ -125,8 +125,14 @@ mul_uint32__prologue:
     addi sp, sp, -8
     sw s0, 0(sp)
     sw s1, 4(sp)
+    blt a1, a0, mul_uint32__a1_smaller
+    mv s0, a1
+    mv s1, a0
+    j mul_uint32__body
+mul_uint32__a1_smaller:
     mv s0, a0
     mv s1, a1
+
 mul_uint32__body:
     li t0, 0 # init value
     li t1, 0 # loop index

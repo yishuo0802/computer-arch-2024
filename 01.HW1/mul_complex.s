@@ -17,25 +17,21 @@ main:
     addi sp, sp, -4
     sw ra, 0(sp)
     jal ra, inference
-    lw ra, 0(sp)
 
     li a0, 0x40100000 # a0: 2.25
     li a1, 0x40D00000 # a1: 6.5
     li a2, 0x40580000 # a2: 3.375
     li a3, 0x41280000 # a3: 10.5
-    addi sp, sp, -4
-    sw ra, 0(sp)
     jal ra, inference
-    lw ra, 0(sp)
 
     li a0, 0xBF900000 # a0: -1.125
     li a1, 0xC0600000 # a1: -3.5
     li a2, 0xC0900000 # a2: -4.5
     li a3, 0x40100000 # a3: 2.25
-    addi sp, sp, -4
-    sw ra, 0(sp)
     jal ra, inference
     lw ra, 0(sp)
+    addi sp, sp, 4
+
     j exit
 
 add_float32:
@@ -396,7 +392,7 @@ fp32_to_fp16__epilogue:
 
 inference:
 inference__prologue:
-    addi sp,sp, -20
+    addi sp, sp, -20
     sw s0, 0(sp)
     sw s1, 4(sp)
     sw s2, 8(sp)
@@ -448,259 +444,220 @@ inference__body:
     mv a0, s0
     mv a1, s2
     jal ra, mul_float32
-    lw ra, 0(sp)
-    addi sp, sp, 4
     mv t0, a0
-    addi sp, sp, -8
-    sw ra, 0(sp)
-    sw t0, 4(sp)
+    addi sp, sp, -4
+    sw t0, 0(sp)
     mv a0, s1
     mv a1, s3
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    addi sp, sp, 8
+    lw t0, 0(sp)
+    addi sp, sp, 4
     # put the sub symbol into sign bit
     li s4, 0x80000000
     xor t1, a0, s4
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, t0
     mv a1, t1
     jal ra, add_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv t0, a0 # t0: real_part_fp32
 
-    addi sp, sp, -8
-    sw ra, 0(sp)
-    sw t0, 4(sp)
+    addi sp, sp, -4
+    sw t0, 0(sp)
     mv a0, s0
     mv a1, s3
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    addi sp, sp, 8
+    lw t0, 0(sp)
+    addi sp, sp, 4
     mv t1, a0
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s1
     mv a1, s2
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, a0
     mv a1, t1
     jal ra, add_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv t1, a0 # t1: imag_part_fp32
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s0
     jal ra, fp32_to_fp16
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s0, a0 # s0: fp16 num1_real
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s1
     jal ra, fp32_to_fp16
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s1, a0 # s1: fp16 num1_img
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s2
     jal ra, fp32_to_fp16
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s2, a0 # s2: fp16 num2_real
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s3
     jal ra, fp32_to_fp16
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s3, a0 # s3: fp16 num2_img
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s0
     jal ra, fp16_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s0, a0 # s0: fp16 num1_real to fp32
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s1
     jal ra, fp16_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s1, a0 # s1: fp16 num1_img to fp32
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s2
     jal ra, fp16_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s2, a0 # s2: fp16 num2_real to fp32
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s3
     jal ra, fp16_to_fp32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv s3, a0 # s3: fp16 num2_img to fp32
 
-    addi sp, sp, -12
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     mv a0, s0
     mv a1, s2
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    addi sp, sp, 12
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     mv t2, a0
 
-    addi sp, sp, -16
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
+    addi sp, sp, -12
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
     mv a0, s1
     mv a1, s3
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    addi sp, sp, 16
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    addi sp, sp, 12
     # put the sub symbol into sign bit
     li s4, 0x80000000
     xor t3, a0, s4
 
-    addi sp, sp, -20
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw t3, 12(sp)
     mv a0, t2
     mv a1, t3
     jal ra, add_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
-    addi sp, sp, 20
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw t3, 12(sp)
+    addi sp, sp, 16
     mv t2, a0 # t2: real_part_fp16
 
-    addi sp, sp, -16
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
+    addi sp, sp, -12
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
     mv a0, s0
     mv a1, s3
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    addi sp, sp, 16
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    addi sp, sp, 12
     mv t3, a0
 
-    addi sp, sp, -20
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw t3, 12(sp)
     mv a0, s1
     mv a1, s2
     jal ra, mul_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
-    addi sp, sp, 20
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw t3, 12(sp)
+    addi sp, sp, 16
 
-    addi sp, sp, -20
-    sw ra, 0(sp)
-    sw t0, 4(sp)
-    sw t1, 8(sp)
-    sw t2, 12(sp)
-    sw t3, 16(sp)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw t3, 12(sp)
     mv a0, a0
     mv a1, t3
     jal ra, add_float32
-    lw ra, 0(sp)
-    lw t0, 4(sp)
-    lw t1, 8(sp)
-    lw t2, 12(sp)
-    lw t3, 16(sp)
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw t3, 12(sp)
+    lw ra, 16(sp)
     addi sp, sp, 20
     mv t3, a0 # t3: imag_part_fp16
 
@@ -740,7 +697,7 @@ inference__epilogue:
     lw s2, 8(sp)
     lw s3, 12(sp)
     lw s4, 16(sp)
-    addi sp,sp, 20
+    addi sp, sp, 20
     ret
 exit:
     li a7, 10

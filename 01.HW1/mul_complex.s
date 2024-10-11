@@ -118,36 +118,36 @@ add_float32__epilogue:
     addi sp, sp, 12
     ret
 
+
 mul_uint32:
-mul_uint32__prologue:
-    # a0 = a0 * a1
-    #? optimize find the smaller one
-    addi sp, sp, -8
+    addi sp, sp, -12
     sw s0, 0(sp)
     sw s1, 4(sp)
-    blt a1, a0, mul_uint32__a1_smaller
-    mv s0, a1
-    mv s1, a0
-    j mul_uint32__body
-mul_uint32__a1_smaller:
-    mv s0, a0
-    mv s1, a1
+    sw s2, 8(sp)
 
-mul_uint32__body:
-    li t0, 0 # init value
-    li t1, 0 # loop index
-mul_uint32__loop_start:
-    bge t1, s1, mul_uint32__loop_end
-    add t0, t0, s0
-    addi t1, t1, 1
-    j mul_uint32__loop_start
-mul_uint32__loop_end:
-mul_uint32__epilogue:
+    li s0, 0    # s0: current result
+    li t0, 0    # t0: loop index
+    li t1, 16    # t1: loop bound
+mul_uint32_LOOP1_BEGIN:
+    bge t0, t1, mul_uint32_LOOP_END
+
+    srl s1, a1, t0
+    andi s1, s1, 1
+    beqz s1, mul_uint32_IF_END
+
+    sll s2, a0, t0
+    add s0, s0, s2
+mul_uint32_IF_END:
+
+    addi t0, t0, 1
+    j mul_uint32_LOOP1_BEGIN
+mul_uint32_LOOP_END:
+
+    mv a0, s0
     lw s0, 0(sp)
     lw s1, 4(sp)
-    addi sp, sp, 8
-
-    mv a0, t0
+    lw s2, 8(sp)
+    addi sp, sp, 12
     ret
 
 mul_float32:
